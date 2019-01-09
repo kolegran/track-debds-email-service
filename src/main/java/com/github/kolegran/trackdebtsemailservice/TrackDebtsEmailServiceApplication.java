@@ -25,8 +25,8 @@ public class TrackDebtsEmailServiceApplication {
         Set<UserLedger> victim = new HashSet<>();
 
         for (UserLedger userLedger : userLedgers) {
-            for (UserBalance userBalance : userLedger.userBalanceList) {
-                if (userBalance.amount.compareTo(new BigDecimal(-80)) < 0) {
+            for (UserBalance userBalance : userLedger.getUserBalanceList()) {
+                if (userBalance.getAmount().compareTo(new BigDecimal(-100)) < 0) {
                     victim.add(userLedger);
                 }
             }
@@ -41,7 +41,7 @@ public class TrackDebtsEmailServiceApplication {
 
     private static void sendEmail(UserLedger userLedger) {
         try {
-            SmptExample.emailSender(userLedger.description());
+            SmtpExample.emailSender(userLedger);
         } catch (Exception e)
         {
             System.err.println("Error");
@@ -55,16 +55,17 @@ public class TrackDebtsEmailServiceApplication {
 
         while (userRs.next()) {
             UserLedger userLedger = new UserLedger();
-            userLedger.userId = userRs.getLong("id");
-            userLedger.fullName = userRs.getString("first_name") + " " + userRs.getString("last_name");
+            userLedger.setUserId(userRs.getLong("id"));
+            userLedger.setFullName(userRs.getString("first_name") + " " + userRs.getString("last_name"));
+            userLedger.setUserEmail(userRs.getString("email"));
             Map<Long, BigDecimal> sumPerUser = getLedger(connection, userRs.getLong("id"));
 
             for (Long userId : sumPerUser.keySet()) {
                 UserBalance userBalance = new UserBalance();
-                userBalance.userId = userId;
-                userBalance.fullName = getFullNameByUserId(connection, userId);
-                userBalance.amount = sumPerUser.get(userId);
-                userLedger.userBalanceList.add(userBalance);
+                userBalance.setUserId(userId);
+                userBalance.setFullName(getFullNameByUserId(connection, userId));
+                userBalance.setAmount(sumPerUser.get(userId));
+                userLedger.getUserBalanceList().add(userBalance);
             }
 
             res.add(userLedger);
@@ -99,45 +100,6 @@ public class TrackDebtsEmailServiceApplication {
                 sumPerUser.put(senderId, sum.subtract(senderRs.getBigDecimal("amount")));
             }
         }
-
         return sumPerUser;
     }
-
-}
-
-class UserLedger {
-    Long userId;
-    String fullName;
-    List<UserBalance> userBalanceList = new ArrayList<>();
-
-    BigDecimal totalDebt() {
-        BigDecimal s = BigDecimal.ZERO;
-        for (UserBalance userBalance : userBalanceList) {
-            if (userBalance.amount.compareTo(BigDecimal.ZERO) < 0) {
-                s = s.add(userBalance.amount);
-            }
-        }
-        return s.multiply(new BigDecimal(-1));
-    }
-
-    public String description() {
-        /*System.out.println("User id is: " + userId);
-        System.out.println("User full name: " + fullName);
-
-        for (UserBalance u : userBalanceList) {
-            System.out.println("You are the debtor of " + u.fullName + ". The debt is: " + u.amount);
-        }
-
-        System.out.println("Total debt is: " + totalDebt());
-        System.out.println();*/
-
-        // for test
-        return userId.toString();
-    }
-}
-
-class UserBalance {
-    Long userId;
-    String fullName;
-    BigDecimal amount;
 }
