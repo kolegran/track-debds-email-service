@@ -8,16 +8,30 @@ import java.util.List;
 
 public class NotificationService {
 
+    private String hostName;
+    private int port;
+    private String userName;
+    private String password;
+    private boolean ssl;
+
+    public NotificationService(String hostName, int port, String userName, String password, boolean ssl) {
+        this.hostName = hostName;
+        this.port = port;
+        this.userName = userName;
+        this.password = password;
+        this.ssl = ssl;
+    }
+
     public void send(UserLedger userLedger) {
         try {
             HtmlEmail email = new HtmlEmail();
 
-            email.setHostName("smtp.gmail.com");
-            email.setSmtpPort(587);
-            email.setAuthenticator(new DefaultAuthenticator("smtp.test.kolegran@gmail.com", "1qazXsw2"));
-            email.setSSL(true);
+            email.setHostName(hostName);
+            email.setSmtpPort(port);
+            email.setAuthenticator(new DefaultAuthenticator(userName, password));
+            email.setSSL(ssl);
 
-            email.setFrom("smtp.test.kolegran@gmail.com", "Sender");
+            email.setFrom(userName, "Sender");
             email.addTo(userLedger.getUserEmail(), "Recipient");
 
             email.setSubject("Track debts");

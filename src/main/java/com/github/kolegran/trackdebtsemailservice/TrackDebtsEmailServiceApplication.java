@@ -21,7 +21,13 @@ public class TrackDebtsEmailServiceApplication {
         dataSource.setDatabaseName("track-debts");
 
         UserRepository userRepository = new UserRepositoryDB(dataSource);
-        NotificationService notificationService = new NotificationService();
+        NotificationService notificationService = new NotificationService(
+                "smtp.gmail.com",
+                587,
+                "smtp.test.kolegran@gmail.com",
+                "1qazXsw2",
+                true
+        );
 
         DebtReminderService debtReminderService = new DebtReminderService(userRepository, notificationService);
 
