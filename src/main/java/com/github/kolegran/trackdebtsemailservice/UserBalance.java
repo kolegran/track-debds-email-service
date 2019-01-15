@@ -2,7 +2,7 @@ package com.github.kolegran.trackdebtsemailservice;
 
 import java.math.BigDecimal;
 
-class UserBalance {
+public class UserBalance {
     private Long userId;
     private String fullName;
     private BigDecimal amount;

@@ -21,4 +21,6 @@ repositories {
 dependencies {
     compile 'org.postgresql:postgresql:42.2.5'
     compile 'org.apache.commons:commons-email:1.2'
+    compile 'org.quartz-scheduler:quartz:2.2.1'
+    compile 'org.quartz-scheduler:quartz-jobs:2.2.1'
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-class UserLedger {
+public class UserLedger {
     private Long userId;
     private String fullName;
     private String userEmail;
