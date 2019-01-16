@@ -8,9 +8,11 @@ import java.util.*;
 
 public class UserRepositoryDB implements UserRepository {
     private final DataSource dataSource;
+    private final UserRowMapper userRowMapper;
 
-    public UserRepositoryDB(DataSource dataSource) {
+    public UserRepositoryDB(DataSource dataSource, UserRowMapper userRowMapper) {
         this.dataSource = dataSource;
+        this.userRowMapper = userRowMapper;
     }
 
     public List<UserLedger> getUserLedgers() {
@@ -21,17 +23,13 @@ public class UserRepositoryDB implements UserRepository {
 
             while (userRs.next()) {
                 UserLedger userLedger = new UserLedger();
-                userLedger.setUserId(userRs.getLong("id"));
-                userLedger.setFullName(getDisplayName(userRs.getString("first_name"), userRs.getString("last_name"), userRs.getString("email")));
-                userLedger.setUserEmail(userRs.getString("email"));
+                userLedger.setUser(userRowMapper.map(userRs));
                 Map<Long, BigDecimal> sumPerUser = getLedger(userRs.getLong("id"));
 
                 for (Long userId : sumPerUser.keySet()) {
                     UserBalance userBalance = new UserBalance();
-                    userBalance.setUserId(userId);
 
-                    ResultSet fullNames = getFullNameByUserId(userId);
-                    userBalance.setFullName(getDisplayName(fullNames.getString("first_name"), fullNames.getString("last_name"), fullNames.getString("email")));
+                    userBalance.setUser(userRowMapper.map(getUserById(userId)));
 
                     userBalance.setAmount(sumPerUser.get(userId));
                     userLedger.getUserBalanceList().add(userBalance);
@@ -67,22 +65,11 @@ public class UserRepositoryDB implements UserRepository {
         return sumPerUser;
     }
 
-    public ResultSet getFullNameByUserId(Long userId)  throws SQLException {
+    public ResultSet getUserById(Long userId)  throws SQLException {
         ResultSet result = dataSource.getConnection().createStatement().executeQuery("select * from users where id = " + userId + "order by id");
 
         result.next();
 
         return result;
-    }
-
-    public String getDisplayName(String firstName, String lastName, String userEmail) {
-        return Optional.ofNullable(getFullName(firstName, lastName)).orElse(userEmail);
-    }
-
-    public String getFullName(String firstName, String lastName) {
-        if (firstName == null) {
-            return Optional.ofNullable(lastName).orElse(null);
-        }
-        return firstName + (lastName == null ? "" : (" " + lastName));
     }
 }

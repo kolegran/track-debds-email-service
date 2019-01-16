@@ -5,28 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserLedger {
-    private Long userId;
-    private String fullName;
-    private String userEmail;
+    private User user;
     private List<UserBalance> userBalanceList = new ArrayList<>();
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getFullName() {
-        return fullName;
+    public void setUser(User user) {
+        this.user = user;
     }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getUserEmail() { return userEmail; }
-
-    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
 
     public List<UserBalance> getUserBalanceList() {
         return userBalanceList;

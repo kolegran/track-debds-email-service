@@ -32,15 +32,13 @@ public class NotificationService {
             email.setSSL(ssl);
 
             email.setFrom(userName, "Sender");
-            email.addTo(userLedger.getUserEmail(), "Recipient");
+            email.addTo(userLedger.getUser().getEmail(), "Recipient");
 
             email.setSubject("Track debts");
 
             String html = readContentFromResource("email.html");
 
-            //String debtorFullName = userLedger.getFullName() == null ? userLedger.getUserEmail() : userLedger.getFullName();
-
-            html = html.replace("DEBTOR_FULL_NAME", userLedger.getFullName());
+            html = html.replace("DEBTOR_FULL_NAME", userLedger.getUser().getDisplayName());
             String listOfDebts = getListOfDebts(userLedger.getUserBalanceList());
             html = html.replace("LIST_OF_DEBTS", listOfDebts);
             html = html.replace("TOTAL_DEBTS", userLedger.totalDebt().toString());
@@ -58,10 +56,9 @@ public class NotificationService {
     }
 
     private String getListOfDebts(List<UserBalance> userBalanceList) {
-
         String res = "";
         for (UserBalance userBalance : userBalanceList) {
-            res += "Your debtor is: " + userBalance.getFullName() + ". The debt is: " + userBalance.getAmount() + "<br>\n";
+            res += "You owe to " + userBalance.getUser().getDisplayName() + " " + userBalance.getAmount() + " uah.<br>\n";
         }
         return res;
     }

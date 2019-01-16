@@ -3,24 +3,15 @@ package com.github.kolegran.trackdebtsemailservice;
 import java.math.BigDecimal;
 
 public class UserBalance {
-    private Long userId;
-    private String fullName;
+    private User user;
     private BigDecimal amount;
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public BigDecimal getAmount() {

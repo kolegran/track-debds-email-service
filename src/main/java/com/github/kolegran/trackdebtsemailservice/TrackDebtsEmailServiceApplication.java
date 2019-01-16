@@ -20,7 +20,9 @@ public class TrackDebtsEmailServiceApplication {
         dataSource.setPassword("postgres");
         dataSource.setDatabaseName("track-debts");
 
-        UserRepository userRepository = new UserRepositoryDB(dataSource);
+        UserRowMapper userRowMapper = new UserRowMapper();
+
+        UserRepository userRepository = new UserRepositoryDB(dataSource, userRowMapper);
         NotificationService notificationService = new NotificationService(
                 "smtp.gmail.com",
                 587,
