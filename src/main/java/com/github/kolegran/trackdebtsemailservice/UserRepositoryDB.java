@@ -72,6 +72,10 @@ public class UserRepositoryDB implements UserRepository {
 
         result.next();
 
-        return result.getString("first_name") + " " + result.getString("last_name");
+
+        String firstName = result.getString("first_name");
+        String lastName = result.getString("last_name");
+
+        return (firstName == null || lastName == null) ? null : (firstName + lastName);
     }
 }

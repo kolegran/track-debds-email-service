@@ -11,7 +11,7 @@ apply plugin: 'java'
 
 group = 'com.github.kolegran'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 8
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
