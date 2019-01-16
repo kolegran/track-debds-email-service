@@ -38,9 +38,9 @@ public class NotificationService {
 
             String html = readContentFromResource("email.html");
 
-            String debtorFullName = userLedger.getFullName() == null ? userLedger.getUserEmail() : userLedger.getFullName();
+            //String debtorFullName = userLedger.getFullName() == null ? userLedger.getUserEmail() : userLedger.getFullName();
 
-            html = html.replace("DEBTOR_FULL_NAME", debtorFullName);
+            html = html.replace("DEBTOR_FULL_NAME", userLedger.getFullName());
             String listOfDebts = getListOfDebts(userLedger.getUserBalanceList());
             html = html.replace("LIST_OF_DEBTS", listOfDebts);
             html = html.replace("TOTAL_DEBTS", userLedger.totalDebt().toString());

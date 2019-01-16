@@ -4,10 +4,7 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserRepositoryDB implements UserRepository {
     private final DataSource dataSource;
@@ -25,14 +22,17 @@ public class UserRepositoryDB implements UserRepository {
             while (userRs.next()) {
                 UserLedger userLedger = new UserLedger();
                 userLedger.setUserId(userRs.getLong("id"));
-                userLedger.setFullName(userRs.getString("first_name") + " " + userRs.getString("last_name"));
+                userLedger.setFullName(getDisplayName(userRs.getString("first_name"), userRs.getString("last_name"), userRs.getString("email")));
                 userLedger.setUserEmail(userRs.getString("email"));
                 Map<Long, BigDecimal> sumPerUser = getLedger(userRs.getLong("id"));
 
                 for (Long userId : sumPerUser.keySet()) {
                     UserBalance userBalance = new UserBalance();
                     userBalance.setUserId(userId);
-                    userBalance.setFullName(getFullNameByUserId(userId));
+
+                    ResultSet fullNames = getFullNameByUserId(userId);
+                    userBalance.setFullName(getDisplayName(fullNames.getString("first_name"), fullNames.getString("last_name"), fullNames.getString("email")));
+
                     userBalance.setAmount(sumPerUser.get(userId));
                     userLedger.getUserBalanceList().add(userBalance);
                 }
@@ -67,15 +67,22 @@ public class UserRepositoryDB implements UserRepository {
         return sumPerUser;
     }
 
-    public String getFullNameByUserId(Long userId)  throws SQLException {
+    public ResultSet getFullNameByUserId(Long userId)  throws SQLException {
         ResultSet result = dataSource.getConnection().createStatement().executeQuery("select * from users where id = " + userId + "order by id");
 
         result.next();
 
+        return result;
+    }
 
-        String firstName = result.getString("first_name");
-        String lastName = result.getString("last_name");
+    public String getDisplayName(String firstName, String lastName, String userEmail) {
+        return Optional.ofNullable(getFullName(firstName, lastName)).orElse(userEmail);
+    }
 
-        return (firstName == null || lastName == null) ? null : (firstName + lastName);
+    public String getFullName(String firstName, String lastName) {
+        if (firstName == null) {
+            return Optional.ofNullable(lastName).orElse(null);
+        }
+        return firstName + (lastName == null ? "" : (" " + lastName));
     }
 }
