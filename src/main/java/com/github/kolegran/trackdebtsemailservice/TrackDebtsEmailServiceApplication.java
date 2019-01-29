@@ -45,7 +45,7 @@ public class TrackDebtsEmailServiceApplication {
 
         Trigger trigger = newTrigger()
                 .withIdentity("daily-based-for-reminder", "td-group")
-                .withSchedule(CronScheduleBuilder.cronSchedule("0/20 * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule(env.getOrDefault("CRON_EXPRESSION", "0 0 8 ? * MON-FRI *")))
                 .build();
 
         scheduler.scheduleJob(job, trigger);
