@@ -4,6 +4,8 @@ import org.postgresql.ds.PGSimpleDataSource;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.util.Map;
+
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -13,22 +15,23 @@ public class TrackDebtsEmailServiceApplication {
     public static final String DEBT_REMINDER_SERVICE = "debt-reminder-service";
 
     public static void main(String[] args) throws InterruptedException, SchedulerException {
+        Map<String, String> env = System.getenv();
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setServerName("localhost");
-        dataSource.setPortNumber(5434);
-        dataSource.setUser("postgres");
-        dataSource.setPassword("postgres");
-        dataSource.setDatabaseName("track-debts");
+        dataSource.setServerName(env.getOrDefault("DB_HOST", "localhost"));
+        dataSource.setPortNumber(Integer.parseInt(env.getOrDefault("DB_PORT", "5434")));
+        dataSource.setUser(env.getOrDefault("DB_USERNAME", "postgres"));
+        dataSource.setPassword(env.getOrDefault("DB_PASSWORD", "postgres"));
+        dataSource.setDatabaseName(env.getOrDefault("DB_DATABASE", "track-debts"));
 
         UserRowMapper userRowMapper = new UserRowMapper();
 
         UserRepository userRepository = new UserRepositoryDB(dataSource, userRowMapper);
         NotificationService notificationService = new NotificationService(
-                "smtp.gmail.com",
-                587,
-                "smtp.test.kolegran@gmail.com",
-                "1qazXsw2",
-                true
+                env.getOrDefault("HOSTNAME", "smtp.gmail.com"),
+                Integer.parseInt(env.getOrDefault("PORT", "587")),
+                env.getOrDefault("USERNAME", "smtp.test.kolegran@gmail.com"),
+                env.getOrDefault("PASSWORD", "1qazXsw2"),
+                Boolean.parseBoolean(env.getOrDefault("SSL", "true"))
         );
 
         DebtReminderService debtReminderService = new DebtReminderService(userRepository, notificationService);
